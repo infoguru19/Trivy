@@ -1,0 +1,48 @@
+name: Trivy DevSecOps Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  trivy-scan:
+    name: Trivy Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker Image
+      run: |
+        docker build -t myapp:latest .
+
+    - name: Install Trivy
+      run: |
+        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+        sudo mv ./bin/trivy /usr/local/bin
+
+    # Scan Docker image
+    - name: Trivy Image Vulnerability Scan
+      run: |
+        trivy image \
+          --severity HIGH,CRITICAL \
+          --exit-code 1 \
+          myapp:latest
+
+    # Scan source code, secrets, IaC
+    - name: Trivy Filesystem Scan
+      run: |
+        trivy fs \
+          --scanners vuln,secret,config \
+          --severity HIGH,CRITICAL \
+          --exit-code 1 \
+          .
