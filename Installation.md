@@ -20,7 +20,7 @@ Verify
 ```
 trivy --version
 ```
-#Method 2: Snap Store (Quick & Easy)
+# Method 2: Snap Store (Quick & Easy)
 This is the fastest way if you have Snap installed.
 ```
 sudo snap install trivy
