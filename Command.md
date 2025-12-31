@@ -38,17 +38,14 @@ trivy fs .
 
 Scans:
 
-Dependencies
-
-Secrets
-
-Misconfigurations
+- Dependencies
+- Secrets
+- Misconfigurations
 
 Used:
 
-Pre-commit
-
-CI scans
+- Pre-commit
+- CI scans
 
 ### 5️⃣ Scan Only Secrets (Fast Local Check)
 ```
@@ -57,11 +54,9 @@ trivy fs --scanners secret .
 
 Finds:
 
-API keys
-
-Passwords
-
-Tokens
+- API keys
+- Passwords
+- Tokens
 
 ### 6️⃣ Scan Infrastructure as Code (IaC)
 ```
@@ -70,11 +65,9 @@ trivy config .
 
 Supports:
 
-Terraform
-
-Kubernetes YAML
-
-Helm
+- Terraform
+- Kubernetes YAML
+- Helm
 
 CloudFormation
 
@@ -92,10 +85,8 @@ trivy image --vuln-type os,library myapp:latest
 ```
 
 Useful:
-
-OS patching teams
-
-App security separation
+- OS patching teams
+- App security separation
 
 ### 9️⃣ Ignore Known Vulnerabilities (Risk Acceptance)
 
