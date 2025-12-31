@@ -1,8 +1,8 @@
 ### Before: Old Image
 ```
-trivy image nginx:1.25
+trivy image --severity HIGH,CRITICAL nginx:1.25
 ```
 ### After: Leatest image
 ```
-trivy image nginx:latest
+trivy image --severity HIGH,CRITICAL nginx:latest
 ```
