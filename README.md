@@ -89,4 +89,5 @@ Creates a full list of everything inside your app:
 `trivy sbom image myapp:1.0`
 
 ## 4. What Problems Does Trivy Detect?
+<img width="751" height="315" alt="image" src="https://github.com/user-attachments/assets/8acafd47-848b-489e-9718-68f3b7444e76" />
 
