@@ -1,48 +1,54 @@
-name: Trivy DevSecOps Scan
+name: Trivy Scan & Docker Push
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
 
-permissions:
-  contents: read
-  security-events: write
-
 jobs:
-  trivy-scan:
-    name: Trivy Security Scan
+  build-scan-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout source code
+    # Checkout source code
+    - name: Checkout code
       uses: actions/checkout@v4
 
+    # Set up Docker Buildx
     - name: Set up Docker
       uses: docker/setup-buildx-action@v3
 
+    # Login to Docker Hub
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # Build Docker image
     - name: Build Docker Image
       run: |
-        docker build -t myapp:latest .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/myapp:latest .
 
-    - name: Install Trivy
-      run: |
-        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-        sudo mv ./bin/trivy /usr/local/bin
+    # Trivy Image Scan (Security Gate)
+    - name: Trivy Image Scan
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        image-ref: ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+        severity: HIGH,CRITICAL
+        exit-code: 1
+        format: table
 
-    # Scan Docker image
-    - name: Trivy Image Vulnerability Scan
-      run: |
-        trivy image \
-          --severity HIGH,CRITICAL \
-          --exit-code 1 \
-          myapp:latest
-
-    # Scan source code, secrets, IaC
+    # Trivy Filesystem Scan (Secrets + IaC)
     - name: Trivy Filesystem Scan
+      uses: aquasecurity/trivy-action@0.20.0
+      with:
+        scan-type: fs
+        scanners: vuln,secret,config
+        severity: HIGH,CRITICAL
+        exit-code: 1
+
+    # Push Docker Image (Only if scans pass)
+    - name: Push Docker Image
       run: |
-        trivy fs \
-          --scanners vuln,secret,config \
-          --severity HIGH,CRITICAL \
-          --exit-code 1 \
-          .
+        docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
